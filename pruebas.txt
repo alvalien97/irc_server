@@ -1,0 +1,297 @@
+┌──(.venv)─(hzsurf㉿HZsurf)-[~/Escritorio/42/ft_irc]
+└─$ ./ft_irc 6667 mesa 
+Server listening on port 6667
+Socket bound and listening.
+Waiting for connections...
+Client connected fd=4 ip=127.0.0.1
+Client connected fd=5 ip=127.0.0.1
+Client connected fd=6 ip=127.0.0.1
+Client disconnected fd=6
+Client connected fd=6 ip=127.0.0.1
+Client disconnected fd=6
+Client connected fd=6 ip=127.0.0.1
+Client disconnected fd=6
+Client connected fd=6 ip=127.0.0.1
+Client connected fd=7 ip=127.0.0.1
+Client disconnected fd=7
+Client connected fd=7 ip=127.0.0.1
+Client disconnected fd=7
+Client connected fd=7 ip=127.0.0.1
+Client disconnected fd=7
+
+┌──(hzsurf㉿HZsurf)-[~/Escritorio/42/ft_irc]
+└─$ nc -C 127.0.0.1 6667
+com
+:ft_irc.local 421 COM :Unknown command
+man
+d
+hola
+exit
+PAS
+S mesa
+\r\n
+^C
+                                                                                            
+┌──(hzsurf㉿HZsurf)-[~/Escritorio/42/ft_irc]
+└─$ nc -C 127.0.0.1 6667
+PASS mesa
+NICK alice
+USER alice 0 * : Alice
+:ft_irc.local 001 alice :Welcome to the ft_irc network, alice
+:ft_irc.local 002 alice :Your host is ft_irc.local
+:ft_irc.local 003 alice :This server was created for 42 ft_irc
+:ft_irc.local 004 alice ft_irc.local 1.0 o o
+JOIN #42
+:alice!alice@127.0.0.1 JOIN :#42
+:ft_irc.local 331 alice #42 :No topic is set
+:ft_irc.local 353 alice = #42 :@alice
+:ft_irc.local 366 alice #42 :End of /NAMES list
+                                                                                            
+┌──(hzsurf㉿HZsurf)-[~/Escritorio/42/ft_irc]
+└─$ nc -C 127.0.0.1 6667
+PASS mesa
+NICK alice
+USER alice 0 * : Alice
+:ft_irc.local 001 alice :Welcome to the ft_irc network, alice
+:ft_irc.local 002 alice :Your host is ft_irc.local
+:ft_irc.local 003 alice :This server was created for 42 ft_irc
+:ft_irc.local 004 alice ft_irc.local 1.0 o o
+JOIN #42
+:alice!alice@127.0.0.1 JOIN :#42
+:ft_irc.local 331 alice #42 :No topic is set
+:ft_irc.local 353 alice = #42 :@alice
+:ft_irc.local 366 alice #42 :End of /NAMES list
+PRIVMSG #42 :Mensaje de alice
+:alice!alice@127.0.0.1 PRIVMSG #42 :Mensaje de alice
+:bob!Bob@127.0.0.1 JOIN :#42
+:bob!Bob@127.0.0.1 PRIVMSG #42 :Bob es el mejor
+PRIVMSG #42 :Alvaro es un crack
+:alice!alice@127.0.0.1 PRIVMSG #42 :Alvaro es un crack
+TOPIC #42
+:ft_irc.local 331 alice #42 :No topic is set
+TOPIC #42 :Cerezas
+:alice!alice@127.0.0.1 TOPIC #42 :Cerezas
+MODE #42 +t              
+:alice!alice@127.0.0.1 MODE #42 +t
+MODE #42 +i
+:alice!alice@127.0.0.1 MODE #42 +i
+INVITE pepe #42
+:ft_irc.local 401 pepe :No such nick/channel
+INVITE Pepe #42
+:ft_irc.local 401 Pepe :No such nick/channel
+INVITE pepe #42       
+:ft_irc.local 401 pepe :No such nick/channel
+INVITE pepe #42
+:ft_irc.local 341 alice pepe #42
+:pepe!pepe@127.0.0.1 JOIN :#42
+TOPIC #42 :Teclas
+:alice!alice@127.0.0.1 TOPIC #42 :Teclas
+MODE #42 +t
+:alice!alice@127.0.0.1 MODE #42 +t
+MODE #42 +t
+:alice!alice@127.0.0.1 MODE #42 +t
+TOPIC #42 :Perros
+:alice!alice@127.0.0.1 TOPIC #42 :Perros
+MODE #42 -i
+:alice!alice@127.0.0.1 MODE #42 -i
+:pepe!pepe@127.0.0.1 QUIT :Quit
+:pepe!pepe@127.0.0.1 QUIT :Client disconnected
+:pepe!pepe@127.0.0.1 JOIN :#42
+:pepe!pepe@127.0.0.1 QUIT :#42
+:pepe!pepe@127.0.0.1 QUIT :Client disconnected
+MODE #42 +k secret
+:alice!alice@127.0.0.1 MODE #42 + k secret
+:pepe!pepe@127.0.0.1 JOIN :#42
+MODE #42 +o bob
+:alice!alice@127.0.0.1 MODE #42 + +o bob
+:bob!Bob@127.0.0.1 KICK #42 pepe :Kicked
+:pepe!pepe@127.0.0.1 JOIN :#42
+MODE #42 +l 2
+:alice!alice@127.0.0.1 MODE #42 + +l 2
+:bob!Bob@127.0.0.1 KICK #42 pepe :Kicked
+MODE #42 +l 3
+:alice!alice@127.0.0.1 MODE #42 + +l 3
+:pepe!pepe@127.0.0.1 JOIN :#42
+PRIVMSG #42 :Hola perrrrrrooooosssss
+:alice!alice@127.0.0.1 PRIVMSG #42 :Hola perrrrrrooooosssss
+:bob!Bob@127.0.0.1 PART #42 :Adios
+PING :test
+PONG ft_irc.local ::test
+PRIVMSG ft_bot :!help
+:ft_bot!bot@127.0.0.1 PRIVMSG alice :Commands: !help !ping !time !info — or PRIVMSG ft_bot directly
+PRIVMSG #42 :!help
+:ft_bot!bot@127.0.0.1 PRIVMSG #42 :Commands: !help !ping !time !info — or PRIVMSG ft_bot directly
+PRIVMSG ft_bot #42 :!help
+:ft_bot!bot@127.0.0.1 PRIVMSG alice :Unknown command. Try !help
+
+
+┌──(hzsurf㉿HZsurf)-[~/Escritorio/42/ft_irc]
+└─$ nc -C 127.0.0.1 6667
+PASS mesa
+NICK bob
+USER Bob 0 * : Bob
+:ft_irc.local 001 bob :Welcome to the ft_irc network, bob
+:ft_irc.local 002 bob :Your host is ft_irc.local
+:ft_irc.local 003 bob :This server was created for 42 ft_irc
+:ft_irc.local 004 bob ft_irc.local 1.0 o o
+JOIN #42
+:bob!Bob@127.0.0.1 JOIN :#42
+:ft_irc.local 331 bob #42 :No topic is set
+:ft_irc.local 353 bob = #42 :@alice bob
+:ft_irc.local 366 bob #42 :End of /NAMES list
+PRIVMSG #42 :Bob es el mejor
+:bob!Bob@127.0.0.1 PRIVMSG #42 :Bob es el mejor
+:alice!alice@127.0.0.1 PRIVMSG #42 :Alvaro es un crack
+:alice!alice@127.0.0.1 TOPIC #42 :Cerezas
+:alice!alice@127.0.0.1 MODE #42 +t
+TOPIC #42 :Perros
+:ft_irc.local 482 #42 :You're not channel operator
+:alice!alice@127.0.0.1 MODE #42 +i
+:pepe!pepe@127.0.0.1 JOIN :#42
+TOPIC #42 :Teclas
+:ft_irc.local 482 #42 :You're not channel operator
+:alice!alice@127.0.0.1 TOPIC #42 :Teclas
+:alice!alice@127.0.0.1 MODE #42 +t
+TOPIC #42 :Perros
+:ft_irc.local 482 #42 :You're not channel operator
+MODE #42 +t
+:ft_irc.local 482 #42 :You're not channel operator
+:alice!alice@127.0.0.1 MODE #42 +t
+TOPIC #42 :Pe
+:ft_irc.local 482 #42 :You're not channel operator
+:alice!alice@127.0.0.1 TOPIC #42 :Perros
+:alice!alice@127.0.0.1 MODE #42 -i
+:pepe!pepe@127.0.0.1 QUIT :Quit
+:pepe!pepe@127.0.0.1 QUIT :Client disconnected
+:pepe!pepe@127.0.0.1 JOIN :#42
+:pepe!pepe@127.0.0.1 QUIT :#42
+:pepe!pepe@127.0.0.1 QUIT :Client disconnected
+:alice!alice@127.0.0.1 MODE #42 + k secret
+:pepe!pepe@127.0.0.1 JOIN :#42
+:alice!alice@127.0.0.1 MODE #42 + +o bob
+KICK pepe
+:ft_irc.local 461 KICK :Not enough parameters
+KICK #42 pepe 
+:bob!Bob@127.0.0.1 KICK #42 pepe :Kicked
+:pepe!pepe@127.0.0.1 JOIN :#42
+:alice!alice@127.0.0.1 MODE #42 + +l 2
+KICK #42 pepe
+:bob!Bob@127.0.0.1 KICK #42 pepe :Kicked
+:alice!alice@127.0.0.1 MODE #42 + +l 3
+:pepe!pepe@127.0.0.1 JOIN :#42
+KICK #42 Pepe
+:ft_irc.local 441 Pepe #42 :They aren't on that channel
+:alice!alice@127.0.0.1 PRIVMSG #42 :Hola perrrrrrooooosssss
+PART #42 :Adios
+:bob!Bob@127.0.0.1 PART #42 :Adios
+PING :test
+PONG ft_irc.local ::test
+
+
+┌──(hzsurf㉿HZsurf)-[~/Escritorio/42/ft_irc]
+└─$ nc -C 127.0.0.1 6667
+PASS me 
+:ft_irc.local 464 :Password incorrect
+PASS mesa
+USER pepe 0 * : Pepe
+JOIN #42
+:ft_irc.local 451 :You have not registered
+JOIN #42
+:ft_irc.local 451 :You have not registered
+QUIT
+                                                                 
+┌──(hzsurf㉿HZsurf)-[~/Escritorio/42/ft_irc]
+└─$ nc -C 127.0.0.1 6667
+PASS mesa
+NICK pepe 
+USER pepe 0 * Pepe
+:ft_irc.local 001 pepe :Welcome to the ft_irc network, pepe
+:ft_irc.local 002 pepe :Your host is ft_irc.local
+:ft_irc.local 003 pepe :This server was created for 42 ft_irc
+:ft_irc.local 004 pepe ft_irc.local 1.0 o o
+JOIN #42
+:ft_irc.local 473 #42 :Cannot join channel (+i)
+:alice!alice@127.0.0.1 INVITE pepe :#42
+JOIN #42
+:pepe!pepe@127.0.0.1 JOIN :#42
+:ft_irc.local 332 pepe #42 :Cerezas
+:ft_irc.local 353 pepe = #42 :@alice bob pepe
+:ft_irc.local 366 pepe #42 :End of /NAMES list
+:alice!alice@127.0.0.1 TOPIC #42 :Teclas
+:alice!alice@127.0.0.1 MODE #42 +t
+:alice!alice@127.0.0.1 MODE #42 +t
+:alice!alice@127.0.0.1 TOPIC #42 :Perros
+:alice!alice@127.0.0.1 MODE #42 -i
+QUIT
+                                                                 
+┌──(hzsurf㉿HZsurf)-[~/Escritorio/42/ft_irc]
+└─$ nc -C 127.0.0.1 6667
+PASS mesa
+NICK pepe
+USER pepe 0 * Pepe
+:ft_irc.local 001 pepe :Welcome to the ft_irc network, pepe
+:ft_irc.local 002 pepe :Your host is ft_irc.local
+:ft_irc.local 003 pepe :This server was created for 42 ft_irc
+:ft_irc.local 004 pepe ft_irc.local 1.0 o o
+JOIN #42
+:pepe!pepe@127.0.0.1 JOIN :#42
+:ft_irc.local 332 pepe #42 :Perros
+:ft_irc.local 353 pepe = #42 :@alice bob pepe
+:ft_irc.local 366 pepe #42 :End of /NAMES list
+EXIT #42
+:ft_irc.local 421 EXIT :Unknown command
+QUIT #42
+                                                                 
+┌──(hzsurf㉿HZsurf)-[~/Escritorio/42/ft_irc]
+└─$ nc -C 127.0.0.1 6667
+PASS mesa   
+NICK pepe
+USER pepe 0 * Pepe
+:ft_irc.local 001 pepe :Welcome to the ft_irc network, pepe
+:ft_irc.local 002 pepe :Your host is ft_irc.local
+:ft_irc.local 003 pepe :This server was created for 42 ft_irc
+:ft_irc.local 004 pepe ft_irc.local 1.0 o o
+JOIN #42
+:ft_irc.local 475 #42 :Cannot join channel (+k)
+JOIN #42 secret
+:pepe!pepe@127.0.0.1 JOIN :#42
+:ft_irc.local 332 pepe #42 :Perros
+:ft_irc.local 353 pepe = #42 :@alice bob pepe
+:ft_irc.local 366 pepe #42 :End of /NAMES list
+:alice!alice@127.0.0.1 MODE #42 + +o bob
+:bob!Bob@127.0.0.1 KICK #42 pepe :Kicked
+JOIN #42
+:ft_irc.local 475 #42 :Cannot join channel (+k)
+JOIN #42 secret
+:pepe!pepe@127.0.0.1 JOIN :#42
+:ft_irc.local 332 pepe #42 :Perros
+:ft_irc.local 353 pepe = #42 :@alice @bob pepe
+:ft_irc.local 366 pepe #42 :End of /NAMES list
+:alice!alice@127.0.0.1 MODE #42 + +l 2
+:bob!Bob@127.0.0.1 KICK #42 pepe :Kicked
+JOIN #42
+:ft_irc.local 471 #42 :Cannot join channel (+l)
+JOIN #42 secret
+:ft_irc.local 471 #42 :Cannot join channel (+l)
+JOIN #42 secret
+:pepe!pepe@127.0.0.1 JOIN :#42
+:ft_irc.local 332 pepe #42 :Perros
+:ft_irc.local 353 pepe = #42 :@alice @bob pepe
+:ft_irc.local 366 pepe #42 :End of /NAMES list
+:alice!alice@127.0.0.1 PRIVMSG #42 :Hola perrrrrrooooosssss
+:bob!Bob@127.0.0.1 PART #42 :Adios
+PING :test
+PONG ft_irc.local ::test
+:ft_bot!bot@127.0.0.1 PRIVMSG #42 :Commands: !help !ping !time !info — or PRIVMSG ft_bot directly
+
+
+
+USER alice 0 * :Alice, esta linea explicame porque tiene esta sintaxis. Use ctrl+D to send the command in several parts: ’com’, then ’man’, then ’d\n’, esta parte no la entendi muy bien, explicame porque eso?  se utiliza para crear un nuevo comando dentro del servidor? si es asi, donde se almacena? como puedo salir de esa creacion de comandos? que son los codigos 331, 351 y 366? PART #42 :Me voy con este comando me desconecto del servidor? es que no se donde en el subject especifica que hay que hacer esto.... Tampoco se donde viene el quit en el subject aunque tiene sentido tener el quit. es normal tardar tanto aqui: 18:11 -!- Irssi: Join to #42 was synced in 559 secs?? /kick #42 bob con irssi me da problemas, tambien me da problemas el comando /msg. cuando creo el grupo 42 con alice en irssi y luego le pongo permisos privados al grupo para unirse si bob se une a 42 se queda colagado. el comando del bot, a mi no me va. en el archivo pruebas.txt puedes ver pruebas que he hecho con la terminal para que compruebes el correcto funcionamineto
+
+
+
+Porque en irssi si estoy en un canal y me salgo de el ya no me deja volver a invitar o entrar al canal? ademas la barra donde escribo se me queda pillada. uso /query normalmente. 
+USER alice 0 * :Alice, esta linea explicame porque tiene esta sintaxis esto sigo sin entender porque tengo que escribirlo asi en el programa
+Use ctrl+D to send the command in several parts: ’com’, then ’man’, then ’d\n’ esto tampoco porque no se que utilidad tiene lo que me pide el subject.
+En que parte del subject me habla de programar funciones como quit o part?
+Que comandos usar en irssi para todo. dame un listado de los comandos conociendo mis archivos, porque yo uso query para enviar mensaje privado en vez de /msg
