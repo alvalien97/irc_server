@@ -13,7 +13,7 @@ bool Bot::isBotCommand(const std::string& text) {
 }
 
 std::string Bot::buildReply(const std::string& elbot, const std::string& text) {
-    return ":" + NICK + "!" + USER + "@127.0.0.1 PRIVMSG " + elbot + " :" + text;
+    return ":" + NICK + "!" + USER + "@127.0.0.1 PRIVMSG " + elbot + " :" + text; //protocolo IRC (RCF 2812)
 }
 
 std::string Bot::handleMessage(Client* sender, const std::string& text) {

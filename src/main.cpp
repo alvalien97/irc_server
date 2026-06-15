@@ -7,7 +7,7 @@
 bool g_serverRunning = true;
 
 void handleSignal(int signum) {
-    (void)signum;
+    (void)signum;//numero de la señal recibida
     g_serverRunning = false;
 }
 
@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
     std::string password = argv[2];
 
     // Capturamos Ctrl+C (SIGINT) y SIGTERM
-    signal(SIGINT, handleSignal);
+    signal(SIGINT, handleSignal);//ctrl c y ctrl d
     signal(SIGTERM, handleSignal);
 
     try {

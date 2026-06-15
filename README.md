@@ -20,8 +20,6 @@ This produces `ircserv` (required name for evaluation). A symlink `ft_irc` is al
 
 ```bash
 ./ircserv <port> <password>
-# or
-./ft_irc <port> <password>
 ```
 
 Example:

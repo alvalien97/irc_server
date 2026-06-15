@@ -28,7 +28,7 @@ bool Channel::hasClient(int clientFd) const {
 }
 
 size_t Channel::getClientCount() const {
-    return _clients.size();
+    return _clients.size();//tamaño del canal en clientes participando
 }
 
 std::string Channel::getMemberList() const {
@@ -52,7 +52,7 @@ const std::string& Channel::getTopic() const {
 }
 
 bool Channel::isOperator(int clientFd) const {
-    return _operators.find(clientFd) != _operators.end();
+    return _operators.find(clientFd) != _operators.end(); //devuelve operadores del canal
 }
 
 void Channel::addOperator(int clientFd) {

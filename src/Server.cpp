@@ -14,12 +14,12 @@
 
 const std::string Server::SERVER_NAME = "ft_irc.local";
 
-Server::Server(int port, const std::string& password)
+Server::Server(int port, const std::string& password)//inicio server
     : _port(port), _password(password), _serverSocket(-1) {
     std::cout << "Server listening on port " << _port << std::endl;
 }
 
-Server::~Server() {
+Server::~Server() {//destructor (memoria dinamica con mapeado)
     if (_serverSocket != -1)
         close(_serverSocket);
 
@@ -34,16 +34,16 @@ Server::~Server() {
     _channels.clear();
 }
 
-void Server::_initSocket() {
+void Server::_initSocket() {//Creo socket de la red, oido del server.
     _serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (_serverSocket < 0)
         throw std::runtime_error("Failed to create socket");
 
     int opt = 1;
-    if (setsockopt(_serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
+    if (setsockopt(_serverSocket, SOL_SOCKET, SO_REUSEADDR/*reinicio server sin esperar liberar el puerto*/, &opt, sizeof(opt)) < 0)
         throw std::runtime_error("Failed to setsockopt");
 
-    if (fcntl(_serverSocket, F_SETFL, O_NONBLOCK) < 0)
+    if (fcntl(_serverSocket, F_SETFL, O_NONBLOCK) < 0)//evito que el server se bloquee
         throw std::runtime_error("Failed to set non-blocking on server socket");
 
     struct sockaddr_in serverAddr;
@@ -53,7 +53,7 @@ void Server::_initSocket() {
     serverAddr.sin_port = htons(_port);
 
     if (bind(_serverSocket, reinterpret_cast<struct sockaddr*>(&serverAddr), sizeof(serverAddr)) < 0)
-        throw std::runtime_error("Failed to bind socket to port");
+        throw std::runtime_error("Failed to bind socket to port");//bind a la ip/puerto
 
     if (listen(_serverSocket, SOMAXCONN) < 0)
         throw std::runtime_error("Failed to listen on socket");
@@ -67,7 +67,7 @@ void Server::_initSocket() {
     std::cout << "Socket bound and listening." << std::endl;
 }
 
-void Server::_setPollout(int clientFd, bool enable) {
+void Server::_setPollout(int clientFd, bool enable) {//avisame si el buffer esta libre para escribir
     for (size_t i = 0; i < _pollFds.size(); ++i) {
         if (_pollFds[i].fd == clientFd) {
             if (enable)
@@ -79,7 +79,7 @@ void Server::_setPollout(int clientFd, bool enable) {
     }
 }
 
-void Server::_queueForSend(int clientFd, const std::string& message) {
+void Server::_queueForSend(int clientFd, const std::string& message) {//en vez de hacer un send que podria bloquear el servidor, añade el texto de buffer a la salida del cliente y aseguro que acabe en \n o \r
     std::string line = message;
     if (line.size() < 2 || line.substr(line.size() - 2) != "\r\n")
         line += "\r\n";
@@ -87,7 +87,7 @@ void Server::_queueForSend(int clientFd, const std::string& message) {
     _setPollout(clientFd, true);
 }
 
-void Server::_flushOutgoing(int clientFd) {
+void Server::_flushOutgoing(int clientFd) {//llamo a send, si logro enviar todo apaga el pollout, si no borro lo enviado y dejo el resto para la proxima vez. Si el cliente estaba pending y el buffer se vació lo desconecta
     std::map<int, std::string>::iterator bufIt = _outBuffers.find(clientFd);
     if (bufIt == _outBuffers.end() || bufIt->second.empty()) {
         _setPollout(clientFd, false);
@@ -110,7 +110,7 @@ void Server::_flushOutgoing(int clientFd) {
     }
 }
 
-bool Server::_hasPendingWrites() const {
+bool Server::_hasPendingWrites() const {//reviso que no hay bytes pendientes
     for (std::map<int, std::string>::const_iterator it = _outBuffers.begin(); it != _outBuffers.end(); ++it) {
         if (!it->second.empty())
             return true;
@@ -118,14 +118,14 @@ bool Server::_hasPendingWrites() const {
     return false;
 }
 
-void Server::_flushWritableClients() {
+void Server::_flushWritableClients() {//cada vez que start termina si hay una minipoll ejecuta flushoutgoing de forma segura
     if (!_hasPendingWrites())
         return;
 
-    // 1. Actualizamos los revents llamando a poll con timeout 0
+    //Actualizamos los revents llamando a poll con timeout 0
     poll(&_pollFds[0], _pollFds.size(), 0);
 
-    // 2. Recogemos los FDs que tienen POLLOUT en un vector temporal
+    //Recojo los FDs que tienen POLLOUT en un vector temporal
     std::vector<int> fdsToFlush;
     for (size_t i = 0; i < _pollFds.size(); ++i) {
         if (_pollFds[i].revents & POLLOUT) {
@@ -133,7 +133,7 @@ void Server::_flushWritableClients() {
         }
     }
 
-    // 3. Iteramos de forma completamente segura sobre los FDs recolectados
+    //Iteramos de forma completamente segura sobre los FDs recolectados
     for (size_t i = 0; i < fdsToFlush.size(); ++i) {
         int fd = fdsToFlush[i];
         
@@ -154,6 +154,7 @@ void Server::_scheduleDisconnect(int clientFd) {
 }
 
 void Server::_broadcastToChannel(Channel* channel, const std::string& message, int exceptFd) {
+    //envia mensaje a todos los users de un canal
     for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
         if (channel->hasClient(it->first) && it->first != exceptFd)
             _queueForSend(it->first, message);
@@ -161,14 +162,17 @@ void Server::_broadcastToChannel(Channel* channel, const std::string& message, i
 }
 
 std::string Server::_clientPrefix(Client* client) const {
+    //construye mascara estandar de irc
     return ":" + client->getNickname() + "!" + client->getUsername() + "@127.0.0.1";
 }
 
 void Server::_sendNumeric(Client* client, const std::string& line) {
+    //automatiza envio de respuestas oficiales del servidor, anteponiendo nombre de tu servidor
     _queueForSend(client->getFd(), ":" + SERVER_NAME + " " + line);
 }
 
 Client* Server::_findClientByNick(const std::string& nick) {
+    //buscador que recorre el mapa de clientes y empareja nick con su puntero o num de socket
     for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
         if (it->second->getNickname() == nick)
             return it->second;
@@ -184,6 +188,7 @@ int Server::_findFdByNick(const std::string& nick) {
 }
 
 Channel* Server::_getChannel(const std::string& name) {
+    //existe este canal con este nombre?
     std::map<std::string, Channel*>::iterator it = _channels.find(name);
     if (it == _channels.end())
         return 0;
@@ -191,6 +196,7 @@ Channel* Server::_getChannel(const std::string& name) {
 }
 
 void Server::_removeEmptyChannels() {
+    //revisa no haya canales fantasma flotando
     for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ) {
         if (it->second->getClientCount() == 0) {
             delete it->second;
@@ -208,9 +214,9 @@ void Server::_tryRegisterClient(Client* client) {
     const std::string& nick = client->getNickname();
     client->setAuthenticated();
 
-    _sendNumeric(client, "001 " + nick + " :Welcome to the ft_irc network, " + nick);
+    _sendNumeric(client, "001 " + nick + " :Bienvenido, " + nick);
     _sendNumeric(client, "002 " + nick + " :Your host is " + SERVER_NAME);
-    _sendNumeric(client, "003 " + nick + " :This server was created for 42 ft_irc");
+    _sendNumeric(client, "003 " + nick + " :Server created by alvalien and little isra");
     _sendNumeric(client, "004 " + nick + " " + SERVER_NAME + " 1.0 o o");
 }
 
@@ -220,7 +226,7 @@ void Server::_acceptNewClient() {
     int clientFd = accept(_serverSocket, reinterpret_cast<struct sockaddr*>(&clientAddr), &clientLen);
 
     if (clientFd < 0) {
-        if (errno == EAGAIN || errno == EWOULDBLOCK)
+        if (errno == EAGAIN || errno == EWOULDBLOCK)//evito errores no bloqueantes
             return;
         std::cerr << "accept() failed\n";
         return;
@@ -250,7 +256,7 @@ void Server::_disconnectClient(int clientFd) {
         client = _clients[clientFd];
 
     if (client && client->hasNickname()) {
-        std::string quitMsg = _clientPrefix(client) + " QUIT :Client disconnected";
+        std::string quitMsg = _clientPrefix(client) + " QUIT :Client disconnected";//avisa a todos los cliente que compartian canal con el
         for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it) {
             if (it->second->hasClient(clientFd))
                 _broadcastToChannel(it->second, quitMsg, clientFd);
@@ -261,7 +267,7 @@ void Server::_disconnectClient(int clientFd) {
         if (it->second->hasClient(clientFd))
             it->second->removeClient(clientFd);
     }
-    _removeEmptyChannels();
+    _removeEmptyChannels();//borro canal si se queda vacio
 
     close(clientFd);
     _outBuffers.erase(clientFd);
@@ -286,7 +292,7 @@ void Server::_handleClientData(int clientFd) {
     char buf[512];
     std::memset(buf, 0, sizeof(buf));
 
-    int bytesRead = recv(clientFd, buf, sizeof(buf) - 1, 0);
+    int bytesRead = recv(clientFd, buf, sizeof(buf) - 1, 0);//leo hasta 511 bytes y lo concateno al buffer del cliente
     if (bytesRead <= 0) {
         _disconnectClient(clientFd);
         return;
@@ -302,12 +308,14 @@ void Server::_handleClientData(int clientFd) {
 
     // Controlamos en cada iteración que el FD siga registrado en el mapa
     while (_clients.find(clientFd) != _clients.end() && _clients[clientFd]->hasCompleteMessage()) {
-        std::string msg = _clients[clientFd]->extractMessage();
+        std::string msg = _clients[clientFd]->extractMessage();//extrae comandos hasta \r o \n
         _processMessage(_clients[clientFd], msg);
     }
 }
 
 void Server::_joinChannel(Client* client, Channel* channel, const std::string& channelName) {
+    //Introduce al usuario formalmente en el canal, le manda eco del JOIN
+    //topic es 332, 353 y 366 son usuarios conectados
     if (channel->hasClient(client->getFd()))
         return;
 
@@ -417,6 +425,8 @@ void Server::_handleUser(Client* client, const std::string& params) {
 }
 
 void Server::_handleJoin(Client* client, const std::string& params) {
+    //canal no existe lo crea, vrifico reestricciones como +i si es por
+    //invitacion, +l por limite de usuarios, +k por contraseña
     if (!client->isAuthenticated()) {
         _sendNumeric(client, "451 :You have not registered");
         return;
@@ -464,6 +474,7 @@ void Server::_handleJoin(Client* client, const std::string& params) {
 }
 
 void Server::_handlePart(Client* client, const std::string& params) {
+    //saca usuario del canal
     if (params.empty()) {
         _sendNumeric(client, "461 PART :Not enough parameters");
         return;
@@ -588,6 +599,7 @@ void Server::_handlePrivmsg(Client* client, const std::string& params) {
 }
 
 void Server::_handleQuit(Client* client, const std::string& params) {
+    //procesa alida con el comando quit
     
     std::string reason;
     if (params.empty()) {
@@ -895,7 +907,7 @@ void Server::_handlePing(Client* client, const std::string& params) {
         _queueForSend(client->getFd(), "PONG " + SERVER_NAME + " :" + params);
 }
 
-void Server::_handleCap(Client* client, const std::string& params) {
+void Server::_handleCap(Client* client, const std::string& params) {//engaño al cliente para decirle qe no soporto extensiones modernas
     (void)params;
     _queueForSend(client->getFd(), "CAP * LS :");
     _queueForSend(client->getFd(), "CAP * END");
@@ -918,7 +930,7 @@ void Server::_processMessage(Client* client, const std::string& message) {
 
     for (size_t i = 0; i < command.length(); ++i)
         command[i] = static_cast<char>(std::toupper(static_cast<unsigned char>(command[i])));
-
+    //separa el comando de los parametros convirtiendolo a mayusculas
     if (command == "PASS")
         _handlePass(client, params);
     else if (command == "NICK")
@@ -954,7 +966,7 @@ void Server::_processMessage(Client* client, const std::string& message) {
 void Server::start() {
     _initSocket();
     std::cout << "Waiting for connections..." << std::endl;
-
+    //poll para monitorear eventos de la red
     while (g_serverRunning) {
         int pollCount = poll(&_pollFds[0], _pollFds.size(), -1);
         if (pollCount < 0) {
@@ -972,16 +984,16 @@ void Server::start() {
 
             if (revents & (POLLERR | POLLNVAL)) {
                 if (fd != _serverSocket)
-                    _scheduleDisconnect(fd);
+                    _scheduleDisconnect(fd);// si no hay nada en el buffer del cliente lo echa, y si no lo mete en _pendinClose
             } else {
-                if (revents & POLLIN) {
+                if (revents & POLLIN) {//pollin acepta nuevo cliente
                     if (fd == _serverSocket)
                         _acceptNewClient();
                     else
                         _handleClientData(fd);
                 }
 
-                if (revents & POLLOUT)
+                if (revents & POLLOUT)//si un cliente tiene pollout lee manda datos pendientes
                     _flushOutgoing(fd);
 
                 if ((revents & POLLHUP) && fd != _serverSocket)
