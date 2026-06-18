@@ -9,7 +9,10 @@ SRC         = $(SRC_DIR)/main.cpp \
               $(SRC_DIR)/Server.cpp \
               $(SRC_DIR)/Client.cpp \
               $(SRC_DIR)/Channel.cpp \
-              $(SRC_DIR)/Bot.cpp
+              $(SRC_DIR)/Bot.cpp \
+			  $(SRC_DIR)/ServerUtils.cpp \
+			  $(SRC_DIR)/ServerCommands.cpp \
+			  $(SRC_DIR)/ServerChannelCommands.cpp
 
 OBJ         = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 

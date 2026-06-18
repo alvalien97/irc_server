@@ -1,12 +1,10 @@
-*This project has been created as part of the 42 curriculum by alvalien.*
+*This project has been created as part of the 42 curriculum by alvalien and isrguerr.*
 
 ## Description
 
 `ft_irc` is an IRC server written in C++98. It accepts multiple TCP clients on one port, authenticates them with a server password, and supports channels with operator commands (KICK, INVITE, TOPIC, MODE).
 
 The server uses a single `poll()` loop, non-blocking sockets, per-client read buffers (for fragmented commands), and an outbound write queue flushed when `POLLOUT` is ready.
-
-## Instructions
 
 ### Build
 
@@ -47,7 +45,6 @@ Partial command test (subject example):
 
 ```bash
 nc -C 127.0.0.1 6667
-# type: com, Ctrl+D, man, Ctrl+D, d, Enter
 ```
 
 ### Test with an IRC client
@@ -83,8 +80,3 @@ The bot nickname is `ft_bot`. Bonus is only graded if the mandatory part is perf
 - [RFC 1459](https://www.rfc-editor.org/rfc/rfc1459) — Internet Relay Chat Protocol
 - [RFC 2812](https://www.rfc-editor.org/rfc/rfc2812) — IRC client protocol (modern reference)
 - Subject PDF: `irc.pdf`
-- Beej's Guide to Network Programming
-
-### AI usage
-
-AI was used to review the subject requirements, complete missing mandatory features (MODE, command routing, `poll`/POLLOUT write queue), fix disconnect/write ordering, and draft this README. All code was reviewed and compiled locally before submission.

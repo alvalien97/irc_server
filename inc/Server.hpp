@@ -24,12 +24,13 @@ private:
     std::map<int, std::string> _outBuffers;
     std::set<int> _pendingClose;
 
+    // === NÚCLEO Y RED (Server.cpp) ===
     void _initSocket();
     void _acceptNewClient();
     void _handleClientData(int clientFd);
     void _disconnectClient(int clientFd);
-    void _processMessage(Client* client, const std::string& message);
 
+    // === HERRAMIENTAS Y ENTRADA/SALIDA (ServerUtils.cpp) ===
     void _queueForSend(int clientFd, const std::string& message);
     void _flushOutgoing(int clientFd);
     void _setPollout(int clientFd, bool enable);
@@ -37,30 +38,32 @@ private:
     bool _hasPendingWrites() const;
     void _flushWritableClients();
     void _broadcastToChannel(Channel* channel, const std::string& message, int exceptFd);
-
     std::string _clientPrefix(Client* client) const;
     void _sendNumeric(Client* client, const std::string& line);
-    void _tryRegisterClient(Client* client);
     void _removeEmptyChannels();
-    void _joinChannel(Client* client, Channel* channel, const std::string& channelName);
-
     Client* _findClientByNick(const std::string& nick);
     int _findFdByNick(const std::string& nick);
     Channel* _getChannel(const std::string& name);
 
+    // === COMANDOS GENERALES Y CONEXIÓN (ServerCommands.cpp) ===
+    void _processMessage(Client* client, const std::string& message);
+    void _tryRegisterClient(Client* client);
     void _handlePass(Client* client, const std::string& params);
     void _handleNick(Client* client, const std::string& params);
     void _handleUser(Client* client, const std::string& params);
+    void _handleQuit(Client* client, const std::string& params);
+    void _handlePing(Client* client, const std::string& params);
+    void _handleCap(Client* client, const std::string& params);
+
+    // === COMANDOS DE CANAL Y BONUS BOT (ServerChannelCommands.cpp) ===
+    void _joinChannel(Client* client, Channel* channel, const std::string& channelName);
     void _handleJoin(Client* client, const std::string& params);
     void _handlePart(Client* client, const std::string& params);
     void _handlePrivmsg(Client* client, const std::string& params);
-    void _handleQuit(Client* client, const std::string& params);
     void _handleTopic(Client* client, const std::string& params);
     void _handleKick(Client* client, const std::string& params);
     void _handleInvite(Client* client, const std::string& params);
     void _handleMode(Client* client, const std::string& params);
-    void _handlePing(Client* client, const std::string& params);
-    void _handleCap(Client* client, const std::string& params);
     void _handleBotPrivmsg(Client* client, const std::string& target, const std::string& text);
 
 public:
